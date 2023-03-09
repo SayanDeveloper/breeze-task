@@ -7,12 +7,6 @@
       "**/.*",
       "**/node_modules/**",
       "**/.next/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
     ]
   }
 }
