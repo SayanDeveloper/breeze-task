@@ -13,7 +13,7 @@ Create a one page nextJs application. Use firebase for signup/signin and deploy 
 
 ### Live link - https://breeze-ai-task.web.app/
 
-## Getting Started
+## Getting Started in Localhost
 
 First, run the development server:
 
