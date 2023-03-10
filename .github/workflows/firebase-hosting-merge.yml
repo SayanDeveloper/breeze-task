@@ -12,6 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: yarn && yarn build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BREEZE_AI_TASK }}'
+          channelId: live
+          projectId: breeze-ai-task
       - env:
           API_KEY: '${{ secrets.API_KEY }}'
           AUTH_DOMAIN: '${{ secrets.AUTH_DOMAIN }}'
@@ -20,9 +26,3 @@ jobs:
           STORAGE_BUCKET: '${{ secrets.STORAGE_BUCKET }}'
           SENDER_ID: '${{ secrets.SENDER_ID }}'
           APP_ID: '${{ secrets.APP_ID }}'
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BREEZE_AI_TASK }}'
-          channelId: live
-          projectId: breeze-ai-task
