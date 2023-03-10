@@ -15,15 +15,11 @@ Create a one page nextJs application. Use firebase for signup/signin and deploy 
 
 ## Getting Started in Localhost
 
-First, run the development server:
+First, install the dependencies:
+```yarn```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+Then run the local server:
+```yarn dev```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
