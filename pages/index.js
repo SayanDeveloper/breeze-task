@@ -183,7 +183,7 @@ const register = async (e) => {
                             <button onClick={register}>Create an account</button>
                         </form>
                         <div className="text-center" id="dynamic-text">
-                            Have an account?<button onClick={signInShow}><b>Sign In</b></button>
+                            Have an account? <button onClick={signInShow}><b>Sign In</b></button>
                         </div>
                     </div>
                     <div className="for-login" ref={signIn}>
