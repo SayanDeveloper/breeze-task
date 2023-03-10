@@ -4,20 +4,22 @@ import React, { useEffect, useState, useRef } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { auth } from '@/config/firebase';
-import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
+import Loader from '@/components/Loader';
 
 export default function Home() {
   // States
   const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState({});
   const [name, setName] = useState("");
   const [userName, setUserName] = useState("");
   const [logPass, setLogPass] = useState("");
   const [logEmail, setLogEmail] = useState("");
   const [regPass, setRegPass] = useState("");
   const [regEmail, setRegEmail] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Refs
   const signIn = useRef();
@@ -51,16 +53,17 @@ const loginToApp = (e) => {
     setLoading(true);
     signInWithEmailAndPassword(auth, logEmail, logPass)
     .then((userAuth) => {
-        // Signed in 
-        console.log(userAuth.user.displayName);
+      // Signed in 
+      console.log(userAuth.user.displayName);
+      setLoading(false);
     })
     .catch((err) => {
-        alert(err);
+      alert(err);
+      setLoading(false);
     });
-    setLoading(false);
 }
 
-const register = (e) => {
+const register = async (e) => {
     e.preventDefault();
     if (!name) {
         return alert("Please enter your full name.");
@@ -75,10 +78,21 @@ const register = (e) => {
         updateProfile(auth.currentUser, {
             displayName: name,
         })
-        console.log("name", name);
+        console.log("successfully signed up");
         setLoading(false);
-        // alert("User Created");
-    }).catch((err) => alert(err));
+      }).catch((err) => {
+        setLoading(false);
+        alert(err.message)
+      });
+  }
+
+  const logoutHandler = async () => {
+    signOut(auth).then(() => {
+      // Sign-out successful.
+    }).catch((error) => {
+      // An error happened.
+    });
+    
   }
 
   useEffect(() => {
@@ -86,11 +100,15 @@ const register = (e) => {
       onAuthStateChanged(auth, (userAuth) => {
         if (userAuth) {
           // user signed in
+          setLoggedIn(true)
+          setLoggedInUser(userAuth)
           console.log(userAuth);
         } else {
           // User is signed out
-          console.log("logged out")
+          setLoggedIn(false)
+          setLoggedInUser({})
         }
+        setLoading(false)
       });
     }
   }, [auth])
@@ -102,84 +120,103 @@ const register = (e) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main id="login-page" className='flex-col flex-align-center'>
-        <div className="form-side">
-              <div className="form-container">
-                  <div className="for-sign-up" ref={signUp}>
-                      <h2 className='text-center'>Sign Up</h2>
-                      <form action="">
-                          <div>
-                              <input 
-                              type="text" 
-                              value={name}
-                              onChange={(e) => setName(e.target.value)}
-                              required 
-                              />
-                              <label htmlFor="">Full Name</label>
-                          </div>
-                          <div>
-                              <input 
-                              type="text" 
-                              value={userName}
-                              onChange={(e) => setUserName(e.target.value)}
-                              required 
-                              />
-                              <label htmlFor="">Username</label>
-                          </div>
-                          <div>
-                              <input 
-                              type="text" 
-                              value={regEmail}
-                              onChange={(e) => setRegEmail(e.target.value)}
-                              required 
-                              />
-                              <label htmlFor="">Email</label>
-                          </div>
-                          <div>
-                              <input 
-                              type="password" 
-                              value={regPass}
-                              onChange={(e) => setRegPass(e.target.value)}
-                              required 
-                              />
-                              <label htmlFor="">Password</label>
-                          </div>
-                          <button onClick={register}>Create an account</button>
-                      </form>
-                      <div className="text-center" id="dynamic-text">
-                          Have an account? <button onClick={signInShow}><b>Sign In</b></button>
-                      </div>
-                  </div>
-                  <div className="for-login" ref={signIn}>
-                      <h2>Sign In</h2>
-                      <form action="">
-                          <div>
-                              <input 
-                              type="text" 
-                              value={logEmail}
-                              onChange={(e) => setLogEmail(e.target.value)}
-                              required 
-                              />
-                              <label htmlFor="">Email</label>
-                          </div>
-                          <div>
-                              <input 
-                              type="password"
-                              value={logPass}
-                              onChange={(e) => setLogPass(e.target.value)}
-                              required 
-                              />
-                              <label htmlFor="">Password</label>
-                          </div>
-                          <button onClick={loginToApp}>Login</button>
-                      </form>
-                      <div className="text-center" id="dynamic-text">
-                          Don't have an account? <button onClick={signUpShow}><b>Sign Up</b></button>
-                      </div>
-                  </div>
-              </div>
+      {loading &&
+        <Loader />
+      }
+      {
+        loggedIn ?
+        <div>
+          <h1 className='text-center'>
+            Welcome {loggedInUser.displayName},
+          </h1>
+          <h2 className='text-center'>
+            Your email id : {loggedInUser.email}
+          </h2>
+          <div className='flex-center'>
+            <button onClick={logoutHandler}>Logout</button>
           </div>
-      </main>
+        </div>
+        :
+
+        <main id="login-page" className='flex-col flex-align-center'>
+          <div className="form-side">
+                <div className="form-container">
+                    <div className="for-sign-up" ref={signUp}>
+                        <h2 className='text-center'>Sign Up</h2>
+                        <form action="">
+                            <div>
+                                <input 
+                                type="text" 
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required 
+                                />
+                                <label htmlFor="">Full Name</label>
+                            </div>
+                            <div>
+                                <input 
+                                type="text" 
+                                value={userName}
+                                onChange={(e) => setUserName(e.target.value)}
+                                required 
+                                />
+                                <label htmlFor="">Username</label>
+                            </div>
+                            <div>
+                                <input 
+                                type="text" 
+                                value={regEmail}
+                                onChange={(e) => setRegEmail(e.target.value)}
+                                required 
+                                />
+                                <label htmlFor="">Email</label>
+                            </div>
+                            <div>
+                                <input 
+                                type="password" 
+                                value={regPass}
+                                onChange={(e) => setRegPass(e.target.value)}
+                                required 
+                                />
+                                <label htmlFor="">Password</label>
+                            </div>
+                            <button onClick={register}>Create an account</button>
+                        </form>
+                        <div className="text-center" id="dynamic-text">
+                            Have an account? <button onClick={signInShow}><b>Sign In</b></button>
+                        </div>
+                    </div>
+                    <div className="for-login" ref={signIn}>
+                        <h2>Sign In</h2>
+                        <form action="">
+                            <div>
+                                <input 
+                                type="text" 
+                                value={logEmail}
+                                onChange={(e) => setLogEmail(e.target.value)}
+                                required 
+                                />
+                                <label htmlFor="">Email</label>
+                            </div>
+                            <div>
+                                <input 
+                                type="password"
+                                value={logPass}
+                                onChange={(e) => setLogPass(e.target.value)}
+                                required 
+                                />
+                                <label htmlFor="">Password</label>
+                            </div>
+                            <button onClick={loginToApp}>Login</button>
+                        </form>
+                        <div className="text-center" id="dynamic-text">
+                            Don't have an account? <button onClick={signUpShow}><b>Sign Up</b></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+      }
     </>
   )
 }

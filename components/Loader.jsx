@@ -2,7 +2,14 @@ import React from 'react'
 
 const Loader = () => {
   return (
-    <div>Loader</div>
+    <div className="loader-container">
+      <div className="bubble"></div>
+      <div className="bubble"></div>
+      <div className="bubble"></div>
+      <div className="bubble"></div>
+      <div className="bubble"></div>
+      <div className="bubble"></div>
+    </div>
   )
 }
 
