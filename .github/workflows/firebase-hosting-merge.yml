@@ -12,6 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: yarn && yarn build
+      - env:
+          API_KEY: '${{ secrets.API_KEY }}'
+          AUTH_DOMAIN: '${{ secrets.AUTH_DOMAIN }}'
+          PROJECT_ID: '${{ secrets.PROJECT_ID }}'
+          PROJECT_ID: '${{ secrets.PROJECT_ID }}'
+          STORAGE_BUCKET: '${{ secrets.STORAGE_BUCKET }}'
+          SENDER_ID: '${{ secrets.SENDER_ID }}'
+          APP_ID: '${{ secrets.APP_ID }}'
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
